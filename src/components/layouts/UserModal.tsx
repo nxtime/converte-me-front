@@ -21,7 +21,7 @@ const UserModal = ({ userId, isOpen, setIsOpen}: IUserModalProps) => {
       setUser(data);
     }
     fetchUsers();
-  }, []);
+  }, [userId]);
 
   if (user?.id === undefined) return null;
 
