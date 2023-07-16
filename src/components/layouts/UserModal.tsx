@@ -1,9 +1,10 @@
 "use client";
 import { IUserDTO } from "@/interfaces/usersDTO";
 import Modal from "./Modal";
-import { useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import api from "@/app/utils/api";
+import { UserSettingsContext } from "@/stores/UserSettingsProvider";
 
 interface IUserModalProps {
   isOpen: boolean;
@@ -12,17 +13,15 @@ interface IUserModalProps {
 }
 
 const UserModal = ({ userId, isOpen, setIsOpen }: IUserModalProps) => {
-  const [user, setUser] = useState<IUserDTO>({} as IUserDTO);
+  const userSettings = useContext(UserSettingsContext);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const { data } = await api.get<IUserDTO>(`user/${userId}`);
-      setUser(data);
-    };
-    fetchUsers();
-  }, [userId]);
+  console.log(userSettings?.users);
 
-  if (user?.id === undefined) return null;
+  const user = useCallback(() => {
+    return userSettings?.users.find((user) => user.id === userId)!;
+  }, [userSettings?.users]);
+
+  if (user()?.id === undefined) return null;
 
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -30,31 +29,31 @@ const UserModal = ({ userId, isOpen, setIsOpen }: IUserModalProps) => {
         <header className="flex gap-4">
           <img
             className="h-8 w-8 rounded-lg"
-            src={user.avatar_url}
+            src={user().avatar_url}
             alt="User imag"
           />
           <h2 className="text-2xl font-medium flex items-center gap-2">
-            {user.firstName} {user.lastName}{" "}
-            <span className="italic text-lg">({user.id})</span>
+            {user().firstName} {user().lastName}{" "}
+            <span className="italic text-lg">({user().id})</span>
           </h2>
         </header>
         <div className="flex flex-col gap-2">
           <div>
             <span>Email: </span>
             <a
-              href={`mailto:${user.email}`}
+              href={`mailto:${user().email}`}
               className="text-zinc-300 hover:text-zinc-400 transition-colors"
             >
-              {user.email}
+              {user().email}
             </a>
           </div>
           <div className="flex gap-1">
             <span>Gender: </span>
             <div className="flex items-center gap-[2px] text-zinc-300 capitalize">
-              <span>{user.gender}</span>
-              {user.gender === "male" ? (
+              <span>{user().gender}</span>
+              {user().gender === "male" ? (
                 <Icon icon="ic:round-male" />
-              ) : user.gender === "female" ? (
+              ) : user().gender === "female" ? (
                 <Icon icon="ic:round-female" />
               ) : (
                 <Icon icon="tabler:gender-agender" />
@@ -66,11 +65,11 @@ const UserModal = ({ userId, isOpen, setIsOpen }: IUserModalProps) => {
           <header className="flex justify-between">
             <h2 className="text-lg font-medium">Posts:</h2>
             <span className="flex items-center justify-center bg-gray-900 text-xs text-zinc-300 rounded-lg h-6 px-2">
-              {user.posts.length}
+              {user().posts.length}
             </span>
           </header>
           <ul className="flex flex-wrap gap-4">
-            {user.posts.map((post) => {
+            {user().posts.map((post) => {
               return (
                 <li key={post.id}>
                   <button className="h-8 rounded-lg px-4 rounded-btn bg-gray-900 hover:bg-gray-800 active:scale-90 transition-all">
@@ -85,11 +84,11 @@ const UserModal = ({ userId, isOpen, setIsOpen }: IUserModalProps) => {
           <header className="flex justify-between">
             <h2 className="text-lg font-medium">Comments:</h2>
             <span className="flex items-center justify-center bg-gray-900 text-xs text-zinc-300 rounded-lg h-6 px-2">
-              {user.comments.length}
+              {user().comments.length}
             </span>
           </header>
           <ul className="flex flex-wrap gap-4">
-            {user.comments.map((comment) => {
+            {user().comments.map((comment) => {
               return (
                 <li key={comment.id}>
                   <button className="h-8 rounded-lg px-4 rounded-btn bg-gray-900 hover:bg-gray-800 active:scale-90 transition-all">
@@ -98,7 +97,7 @@ const UserModal = ({ userId, isOpen, setIsOpen }: IUserModalProps) => {
                 </li>
               );
             })}
-            {user.comments.length === 0 && (
+            {user().comments.length === 0 && (
               <span className="text-zinc-300">No comments were found</span>
             )}
           </ul>
@@ -107,11 +106,11 @@ const UserModal = ({ userId, isOpen, setIsOpen }: IUserModalProps) => {
           <header className="flex justify-between">
             <h2 className="text-lg font-medium">Followers:</h2>
             <span className="flex items-center justify-center bg-gray-900 text-xs text-zinc-300 rounded-lg h-6 px-2">
-              {user.followers.length}
+              {user().followers.length}
             </span>
           </header>
           <ul className="flex flex-wrap gap-4">
-            {user.followers.map((follower) => {
+            {user().followers.map((follower) => {
               return (
                 <li key={follower.id}>
                   <button className="h-8 rounded-lg px-4 rounded-btn bg-gray-900 hover:bg-gray-800 active:scale-90 transition-all">
@@ -120,7 +119,7 @@ const UserModal = ({ userId, isOpen, setIsOpen }: IUserModalProps) => {
                 </li>
               );
             })}
-            {user.comments.length === 0 && (
+            {user().comments.length === 0 && (
               <span className="text-zinc-300">No followers were found</span>
             )}
           </ul>

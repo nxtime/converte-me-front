@@ -1,5 +1,4 @@
 "use client";
-import api from "@/app/utils/api";
 import { IUserDTO } from "@/interfaces/usersDTO";
 import { UserSettingsContext } from "@/stores/UserSettingsProvider";
 import { Icon } from "@iconify/react";
@@ -9,6 +8,12 @@ const Header = ({ users }: { users: IUserDTO[] }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const userSettings = useContext(UserSettingsContext);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      userSettings?.setUsers(users);
+    }
+  }, []);
 
   const currentUser = useCallback(() => {
     return users?.find((user) => user.id === userSettings?.currentUserId)!;
