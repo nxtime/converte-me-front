@@ -20,7 +20,7 @@ const PostsContainer = async () => {
       </ul>
     );
   } catch (err) {
-    <span>No post was found</span>;
+    return <span>No post was found</span>;
   }
 };
 
