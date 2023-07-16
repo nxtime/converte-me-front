@@ -5,8 +5,15 @@ import { Icon } from "@iconify/react";
 import UserModal from "../../layouts/UserModal";
 import CommentsContainer from "../comments/CommentsContainer";
 import { UserSettingsContext } from "@/stores/UserSettingsProvider";
+import { ICommentsDTO } from "@/interfaces/commentsDTO";
 
-const PostItem = ({ post }: { post: IPostDTO }) => {
+const PostItem = ({
+  post,
+  comments
+}: {
+  post: IPostDTO;
+  comments: ICommentsDTO[];
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
@@ -64,7 +71,7 @@ const PostItem = ({ post }: { post: IPostDTO }) => {
       {isOpen && (
         <div className="flex flex-col gap-4">
           <span>{post.content}</span>
-          <CommentsContainer comments={post.comments} />
+          <CommentsContainer comments={comments} />
         </div>
       )}
       <UserModal

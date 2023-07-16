@@ -9,14 +9,28 @@ const PostsContainer = async () => {
 
     return (
       <ul className="flex flex-col gap-4">
-        {posts.map((post) => (
-          <li
-            key={post.id}
-            className="flex flex-col gap-4 bg-slate-800 transition-colors rounded-md p-4 justify-center"
-          >
-            <PostItem post={post} />
-          </li>
-        ))}
+        {await Promise.all(
+          posts.map(async (post) => {
+            const comments = await Promise.all(
+              post.comments.map(async (comment) => {
+                const { data: commentData } = await api.get(
+                  `comment/${comment.id}`
+                );
+
+                return commentData;
+              })
+            );
+
+            return (
+              <li
+                key={post.id}
+                className="flex flex-col gap-4 bg-slate-800 transition-colors rounded-md p-4 justify-center"
+              >
+                <PostItem post={post} comments={comments} />
+              </li>
+            );
+          })
+        )}
       </ul>
     );
   } catch (err) {
