@@ -5,41 +5,24 @@ import { UserSettingsContext } from "@/stores/UserSettingsProvider";
 import { Icon } from "@iconify/react";
 import { useCallback, useContext, useEffect, useState } from "react";
 
-const Header = () => {
+const Header = ({ users }: { users: IUserDTO[] }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [users, setUsers] = useState<IUserDTO[]>([] as IUserDTO[]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const userSettings = useContext(UserSettingsContext);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const { data } = await api.get<IUserDTO[]>(`user/all`);
-        setUsers(data);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []);
 
   const currentUser = useCallback(() => {
     return users?.find((user) => user.id === userSettings?.currentUserId)!;
   }, [users, userSettings?.currentUserId]);
 
-  if (isLoading)
-    return (
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold h-16 flex items-center">
-          ConverteMe
-        </h2>
-        <span>Loading...</span>
-      </div>
-    );
+  // if (isLoading)
+  //   return (
+  //     <div className="flex justify-between items-center">
+  //       <h2 className="text-2xl font-bold h-16 flex items-center">
+  //         ConverteMe
+  //       </h2>
+  //       <span>Loading...</span>
+  //     </div>
+  //   );
 
   if (!currentUser()?.id)
     return (
